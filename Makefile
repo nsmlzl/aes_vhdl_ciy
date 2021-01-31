@@ -12,30 +12,42 @@ tbs += sim/blinky_tb.vhd
 
 sim_targets := ${patsubst sim/%.vhd, %_SIM, ${tbs}}
 
+builddir := build
 
-ghdl := ghdl
-ghdl_args := --workdir=build --std=08
+
+docker_ghdl := docker run --rm -it -v ${shell pwd}:/work -w /work hdlc/ghdl:yosys
+ghdl := ${docker_ghdl} ghdl
+ghdl_args := --workdir=${builddir} --std=08
+stop_time := 500us
+
+docker_yosys := docker run --rm -it -v ${shell pwd}:/work -w /work hdlc/ghdl:yosys
+yosys := ${docker_yosys} yosys
+
+docker_nextpnr := docker run --rm -it -v ${shell pwd}:/work -w /work hdlc/nextpnr:ice40
+nextpnr-ice40 := ${docker_nextpnr} nextpnr-ice40
+
+docker_icepack := docker run --rm -it -v ${shell pwd}:/work -w /work hdlc/icestorm
+icepack := ${docker_icepack} icepack
+
 # print colorful
-yellow = `tput setaf 3`
-reset = `tput sgr0`
+yellow := `tput setaf 3`
+reset := `tput sgr0`
 
 
-plt_name = plot.ghw
+plt_name := plot.ghw
 
-
-# TODO: yosys synthesis
-# TODO: nextpnr place and route
+fpga := lp8k
 
 
 # GHDL
 # simulate all units with ghdl
 ghdl_simulation: ${sim_targets}
-	@echo "${yellow}GHDL: Completed simulation succesfully!${reset}"
+	@echo "${yellow}GHDL: Simulation succesfull!${reset}"
 
 # simulate % unit with ghdl
 %_SIM: %_ELAB
 	@echo "${yellow}GHDL: Simulation of $*${reset}"
-	@${ghdl} -r ${ghdl_args} $* --stop-time=500us --wave=${plt_name}
+	@${ghdl} -r ${ghdl_args} $* --stop-time=${stop_time} --wave=${plt_name}
 
 # elaborate % unit with ghdl
 %_ELAB: ghdl_analysis
@@ -55,6 +67,35 @@ view_plot:
 ghdl_check_syntax:
 	@echo "${yellow}GHDL: Syntax check${reset}"
 	@${ghdl} -s ${ghdl_args} ${srcs} ${tbs}
+
+# YOSYS - synthesis
+synthesis: ${builddir}/${top_module}.json
+# TODO: .json to fix xyntax highlighting
+${builddir}/%.json : ${srcs}
+	@mkdir -p build
+	@${yosys} -m ghdl -p 'ghdl ${srcs} -e $*; synth_ice40 -json $@'
+	@echo "${yellow}YOSYS: Synthesis succesfull!${reset}"
+
+# NEXTPNR - place and route
+pandr: ${builddir}/${top_module}.asc
+${builddir}/%.asc: ${builddir}/%.json
+	@${nextpnr-ice40} --${fpga} --package cm81 --pcf pins.pcf --asc $@ --json $^
+	@echo "${yellow}NEXTPNR: Place & route succesfull!${reset}"
+
+# ICEPACK - generate bitstream
+bin: ${builddir}/${top_module}.bin
+${builddir}/%.bin: ${builddir}/%.asc
+	@${icepack} $^ $@
+	@echo "${yellow}ICEPACK: Generation bitstream succesfull!${reset}"
+
+# TINYPROG - program device with bitstream
+prog: ${builddir}/${top_module}.bin
+	@tinyprog -p $^
+	@echo "${yellow}TINYPROG: Flashing succesfull!${reset}"
+
+# start docker container
+docker_yosys docker_ghdl docker_nextpnr docker_icepack:
+	${$@} bash
 
 .phony: clean
 clean:
