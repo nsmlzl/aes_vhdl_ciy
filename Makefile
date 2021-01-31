@@ -1,14 +1,11 @@
 # modules
-top_module := blinky
 srcs := hdl/subbytes.vhd
 srcs += hdl/key_schedule_func.vhd
 srcs += hdl/key_scheduler.vhd
-srcs += hdl/blinky.vhd
 # testbenches
 tbs := sim/subbytes_tb.vhd
 tbs += sim/key_schedule_func_tb.vhd
 tbs += sim/key_scheduler_tb.vhd
-tbs += sim/blinky_tb.vhd
 
 sim_targets := ${patsubst sim/%.vhd, %_SIM, ${tbs}}
 
