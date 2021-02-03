@@ -1,7 +1,9 @@
 # modules
+top_module := top
 srcs := hdl/subbytes.vhd
 srcs += hdl/key_schedule_func.vhd
 srcs += hdl/key_scheduler.vhd
+srcs += hdl/top.vhd
 # testbenches
 tbs := sim/subbytes_tb.vhd
 tbs += sim/key_schedule_func_tb.vhd
