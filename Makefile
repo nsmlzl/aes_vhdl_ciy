@@ -55,7 +55,7 @@ ghdl_simulation: $(sim_targets)
 
 # analyse all vhdl files with ghdl
 ghdl_analysis: build/work-obj08.cf
-build/work-obj08.cf: $(srcs) $(tbs)
+$(builddir)/work-obj08.cf: $(srcs) $(tbs)
 	@mkdir -p build
 	@echo "$(yellow)GHDL: Analysis$(reset)"
 	@$(ghdl) -a $(ghdl_args) $^
@@ -63,7 +63,7 @@ build/work-obj08.cf: $(srcs) $(tbs)
 view_plot:
 	gtkwave $(plt_name) $(gtkw)
 
-ghdl_check_syntax:
+ghdl_check_syntax: $(builddir)/work-obj08.cf
 	@echo "$(yellow)GHDL: Syntax check$(reset)"
 	@$(ghdl) -s $(ghdl_args) $(srcs) $(tbs)
 
