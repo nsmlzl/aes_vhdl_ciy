@@ -67,9 +67,13 @@ $(builddir)/work-obj08.cf: $(srcs) $(tbs)
 view_plot:
 	gtkwave $(plt_name) $(gtkw)
 
-ghdl_check_syntax: $(builddir)/work-obj08.cf
+ghdl_syntax_check: $(builddir)/work-obj08.cf
 	@echo "$(yellow)GHDL: Syntax check$(reset)"
 	@$(ghdl) -s $(ghdl_args) $(srcs) $(tbs)
+
+ghdl_synth_check: $(builddir)/work-obj08.cf
+	@echo "$(yellow)GHDL: Synthesis check$(reset)"
+	$(ghdl) --synth $(ghdl_args) $(top_module)
 
 # YOSYS - synthesis
 synthesis: $(builddir)/$(top_module).json
