@@ -5,6 +5,7 @@ srcs += hdl/subbytes.vhd
 srcs += hdl/key_schedule_func.vhd
 srcs += hdl/key_scheduler.vhd
 srcs += hdl/shift_row.vhd
+srcs += hdl/xtime.vhd
 srcs += hdl/top.vhd
 # testbenches
 tbs := sim/aes_package_tb.vhd
@@ -12,6 +13,7 @@ tbs += sim/subbytes_tb.vhd
 tbs += sim/key_schedule_func_tb.vhd
 tbs += sim/key_scheduler_tb.vhd
 tbs += sim/shift_row_tb.vhd
+tbs += sim/xtime_tb.vhd
 
 sim_targets := $(patsubst sim/%.vhd, %_SIM, $(tbs))
 
@@ -67,7 +69,7 @@ $(builddir)/work-obj08.cf: $(srcs) $(tbs)
 view_plot:
 	gtkwave $(plt_name) $(gtkw)
 
-ghdl_syntax_check: $(builddir)/work-obj08.cf
+ghdl_syntax_check:
 	@echo "$(yellow)GHDL: Syntax check$(reset)"
 	@$(ghdl) -s $(ghdl_args) $(srcs) $(tbs)
 
