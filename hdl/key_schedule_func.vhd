@@ -23,7 +23,7 @@ architecture key_schedule_func_arch of key_schedule_func is
 
 	signal s_round_coef : std_logic_vector(7 downto 0) := (others => '0');
 
-	component subbytes is
+	component subbyte is
 		port (
 			clk		: in  std_logic;
 			input	: in  std_logic_vector(7 downto 0);
@@ -33,7 +33,7 @@ architecture key_schedule_func_arch of key_schedule_func is
 	signal s_sb_input, s_sb_output: std_logic_vector(7 downto 0);
 
 begin
-	sb1: subbytes
+	sb1: subbyte
 	port map (
 		clk => clk,
 		input => s_sb_input,
@@ -62,7 +62,7 @@ begin
 					s_sb_input <= s_rotated(15 downto 8);
 					state <= SB3_S;
 				when SB3_S =>
-					-- subbytes module needs one extra cycle for computation
+					-- subbyte module needs one extra cycle for computation
 					s_substituted(7 downto 0) <= s_sb_output;
 					s_sb_input <= s_rotated(23 downto 16);
 					state <= SB4_S;

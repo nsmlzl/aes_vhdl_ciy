@@ -2,18 +2,18 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 
-entity subbytes_tb is
+entity subbyte_tb is
 end entity;
 
 
-architecture tb of subbytes_tb is
+architecture tb of subbyte_tb is
 	constant clk_period	: time := 13 us;
 	signal clk		: std_logic;
 
 	signal s_input	: std_logic_vector(7 downto 0);
 	signal s_output	: std_logic_vector(7 downto 0);
 
-	component subbytes is
+	component subbyte is
 		port (
 			clk		: in  std_logic;
 			input	: in  std_logic_vector(7 downto 0);
@@ -31,7 +31,7 @@ begin
 		wait for clk_period/2;
 	end process;
 
-	subbytes1: subbytes
+	subbyte1: subbyte
 	port map (
 		clk		=> clk,
 		input	=> s_input,

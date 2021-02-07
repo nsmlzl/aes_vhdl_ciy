@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 
-entity subbytes is
+entity subbyte is
 	port (
 		clk		: in  std_logic;
 		input	: in  std_logic_vector(7 downto 0);
@@ -11,7 +11,7 @@ entity subbytes is
 end entity;
 
 
-architecture subbytes_arch of subbytes is
+architecture subbyte_arch of subbyte is
 begin
 	process (clk)
 	begin
