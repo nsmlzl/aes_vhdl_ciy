@@ -9,6 +9,7 @@ srcs += hdl/shift_row.vhd
 srcs += hdl/xtime.vhd
 srcs += hdl/mix_column.vhd
 srcs += hdl/mix_columns.vhd
+srcs += hdl/add_round_key.vhd
 srcs += hdl/top.vhd
 # testbenches
 tbs := sim/aes_package_tb.vhd
@@ -20,6 +21,7 @@ tbs += sim/shift_row_tb.vhd
 tbs += sim/xtime_tb.vhd
 tbs += sim/mix_column_tb.vhd
 tbs += sim/mix_columns_tb.vhd
+tbs += sim/add_round_key_tb.vhd
 
 sim_targets := $(patsubst sim/%.vhd, %_SIM, $(tbs))
 
