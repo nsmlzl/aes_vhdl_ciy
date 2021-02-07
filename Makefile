@@ -6,6 +6,7 @@ srcs += hdl/key_schedule_func.vhd
 srcs += hdl/key_scheduler.vhd
 srcs += hdl/shift_row.vhd
 srcs += hdl/xtime.vhd
+srcs += hdl/mix_column.vhd
 srcs += hdl/top.vhd
 # testbenches
 tbs := sim/aes_package_tb.vhd
@@ -14,6 +15,7 @@ tbs += sim/key_schedule_func_tb.vhd
 tbs += sim/key_scheduler_tb.vhd
 tbs += sim/shift_row_tb.vhd
 tbs += sim/xtime_tb.vhd
+tbs += sim/mix_column_tb.vhd
 
 sim_targets := $(patsubst sim/%.vhd, %_SIM, $(tbs))
 
