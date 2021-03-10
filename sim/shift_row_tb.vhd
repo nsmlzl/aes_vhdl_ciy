@@ -49,7 +49,7 @@ begin
 		assert output = x"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 			report "shift_row[2] processed wrong output" severity failure;
 
-		report "shift_row testbench succesfully completed!" severity note;
+		report "success!" severity note;
 		wait;
 	end process;
 

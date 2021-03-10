@@ -65,7 +65,7 @@ begin
 		wait until falling_edge(clk);
 		assert s_output = x"16" report "subbytes calculated wrong result" severity failure;
 
-		report "subbytes testbench succesful!";
+		report "success!";
 		wait;
 	end process;
 

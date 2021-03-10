@@ -58,7 +58,7 @@ begin
 			report "aest_to_vec conversion 2 processed wrong value" severity failure;
 
 
-		report "aes_package testbench succesfull completed!";
+		report "success!";
 		wait;
 	end process;
 end architecture;

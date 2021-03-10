@@ -42,7 +42,7 @@ begin
 		assert output = x"E5"
 			report "xtime [2] processed wrong output" severity failure;
 
-		report "xtime testbench succesfull!" severity note;
+		report "success!" severity note;
 		wait;
 	end process;
 end architecture;

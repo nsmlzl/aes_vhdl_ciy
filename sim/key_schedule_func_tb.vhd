@@ -89,7 +89,7 @@ begin
 		end loop;
 		assert s_output = x"03B1BCC9" report "Wrong result calculated by key_schedule_func" severity failure;
 
-		report "key_schedule_func_tb succesful!" severity note;
+		report "success!" severity note;
 		wait;
 	end process;
 

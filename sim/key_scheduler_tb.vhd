@@ -103,7 +103,7 @@ begin
 				end if;
 			end loop;
 		end loop;
-		report "Key expansion testbench succesful!" severity note;
+		report "success!" severity note;
 
 		wait;
 	end process;
