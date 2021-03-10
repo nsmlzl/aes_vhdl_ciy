@@ -9,7 +9,7 @@ entity key_scheduler is
 		input: in std_logic_vector(127 downto 0);
 		output: out std_logic_vector(127 downto 0);
 		valid : out std_logic;
-		round: in integer range 1 to 10
+		round: in integer range 0 to 10
 	);
 end entity;
 
@@ -26,7 +26,7 @@ architecture key_scheduler_arch of key_scheduler is
 			clk: in std_logic;
 			input: in std_logic_vector(31 downto 0);
 			output: out std_logic_vector(31 downto 0);
-			round: in integer range 1 to 10;
+			round: in integer range 0 to 10;
 			new_data: in std_logic;
 			valid: out std_logic
 		);

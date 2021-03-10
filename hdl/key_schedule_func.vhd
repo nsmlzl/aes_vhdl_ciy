@@ -7,7 +7,7 @@ entity key_schedule_func is
 		clk: in std_logic;
 		input: in std_logic_vector(31 downto 0);
 		output: out std_logic_vector(31 downto 0);
-		round: in integer range 1 to 10;
+		round: in integer range 0 to 10;
 		new_data: in std_logic;
 		valid: out std_logic
 	);
@@ -98,6 +98,7 @@ begin
 				when 8 => s_round_coef <= x"80";
 				when 9 => s_round_coef <= x"1B";
 				when 10 => s_round_coef <= x"36";
+				when others => s_round_coef <= x"00";
 			end case;
 		end if;
 	end process;

@@ -14,7 +14,7 @@ architecture key_schedule_func_tb_arch of key_schedule_func_tb is
 			 clk: in std_logic;
 			 input: in std_logic_vector(31 downto 0);
 			 output: out std_logic_vector(31 downto 0);
-			 round: in integer range 1 to 10;
+			 round: in integer range 0 to 10;
 			 new_data: in std_logic;
 			 valid: out std_logic
 		);
@@ -22,7 +22,7 @@ architecture key_schedule_func_tb_arch of key_schedule_func_tb is
 	signal clk : std_logic := '0';
 	signal s_input : std_logic_vector(31 downto 0) := (others => '0');
 	signal s_output : std_logic_vector(31 downto 0) := (others => '0');
-	signal s_round : integer range 1 to 10 := 1;
+	signal s_round : integer range 0 to 10 := 1;
 	signal s_new_data: std_logic := '0';
 	signal s_valid : std_logic := '0';
 begin

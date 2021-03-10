@@ -14,7 +14,7 @@ architecture key_scheduler_tb_arch of key_scheduler_tb is
 	signal s_input : std_logic_vector(127 downto 0) := (others => '0');
 	signal s_output : std_logic_vector(127 downto 0) := (others => '0');
 	signal s_valid : std_logic := '0';
-	signal s_round : integer range 1 to 10 := 1;
+	signal s_round : integer range 0 to 10 := 1;
 
 	component key_scheduler is
 	port (
@@ -23,7 +23,7 @@ architecture key_scheduler_tb_arch of key_scheduler_tb is
 		input: in std_logic_vector(127 downto 0);
 		output: out std_logic_vector(127 downto 0);
 		valid : out std_logic;
-		round: in integer range 1 to 10
+		round: in integer range 0 to 10
 	);
 	end component;
 begin
