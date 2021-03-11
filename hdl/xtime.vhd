@@ -16,7 +16,7 @@ begin
 		variable v_out : std_logic_vector(7 downto 0) := (others => '0');
 	begin
 		if rising_edge(clk) then
-			v_out := input sll 1;
+			v_out := input(6 downto 0) & '0';
 			if input(7) = '1' then
 				v_out := v_out xor x"1B";
 			end if;
