@@ -11,6 +11,7 @@ srcs += hdl/mix_column.vhd
 srcs += hdl/mix_columns.vhd
 srcs += hdl/add_round_key.vhd
 srcs += hdl/aes_encrypt.vhd
+srcs += hdl/uart.vhd
 srcs += hdl/top.vhd
 # testbenches
 tbs := sim/aes_package_tb.vhd
@@ -24,6 +25,7 @@ tbs += sim/mix_column_tb.vhd
 tbs += sim/mix_columns_tb.vhd
 tbs += sim/add_round_key_tb.vhd
 tbs += sim/aes_encrypt_tb.vhd
+tbs += sim/uart_tb.vhd
 
 sim_targets := $(patsubst sim/%.vhd, %_SIM, $(tbs))
 
@@ -33,7 +35,7 @@ builddir := build
 docker_ghdl := docker run --rm -it -v $(shell pwd):/work -w /work hdlc/ghdl:yosys
 ghdl := $(docker_ghdl) ghdl
 ghdl_args := --workdir=$(builddir) --std=08
-stop_time := 500us
+stop_time := 1500us
 
 docker_yosys := docker run --rm -it -v $(shell pwd):/work -w /work hdlc/ghdl:yosys
 yosys := $(docker_yosys) yosys
