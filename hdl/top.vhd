@@ -4,7 +4,9 @@ use ieee.std_logic_1164.all;
 entity top is
 	port (
 		CLK : in std_logic;
-		LED : out std_logic
+		LED : out std_logic;
+		PIN_1 : in std_logic;
+		PIN_2 : out std_logic
 	);
 end entity;
 
@@ -29,7 +31,50 @@ architecture top_arch of top is
 	signal s_led : std_logic := '0';
 
 	signal counter : integer range 0 to 16000001 := 0;
+
+
+	constant clk_divider : integer := 104;
+	signal uart_clk_cnt : integer range 0 to 250 := 0;
+
+	component uart is
+		port (
+			clk : in  std_logic;
+			tx : out std_logic;
+			rx : in  std_logic;
+			tbyte : in  std_logic_vector(7 downto 0);
+			tbyte_flag : in  std_logic;
+			rbyte : out std_logic_vector(7 downto 0);
+			rbyte_flag : out std_logic
+		);
+	end component;
+	signal uart_clk : std_logic := '0';
+	signal tx, rx : std_logic := '1';
+	signal tbyte, rbyte : std_logic_vector(7 downto 0) := (others => '0');
+	signal tbyte_f, rbyte_f : std_logic := '0';
+
 begin
+	-- generate from 16 MHz clk 19200*8 Hz clk
+	clk_dvd_proc : process (clk) is
+	begin
+		if rising_edge(clk) then
+			uart_clk_cnt <= uart_clk_cnt + 1;
+			if uart_clk_cnt = clk_divider - 1 then
+				uart_clk_cnt <= 0;
+			end if;
+			if uart_clk_cnt < clk_divider/2 then
+				uart_clk <= '0';
+			else
+				uart_clk <= '1';
+			end if;
+		end if;
+	end process;
+	rx <= PIN_1;
+	PIN_2 <= tx;
+	tbyte_f <= rbyte_f;
+	tbyte <= rbyte;
+	uart1 : uart port map (uart_clk, tx, rx, tbyte, tbyte_f, rbyte, rbyte_f);
+
+
 	LED <= s_led;
 	aes_encrypt_1 : aes_encrypt port map (CLK, new_data, plaintext, key, valid, ciphertext);
 
