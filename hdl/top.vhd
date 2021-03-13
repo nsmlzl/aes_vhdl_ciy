@@ -23,7 +23,7 @@ architecture top_arch of top is
 			ciphertext : out std_logic_vector(127 downto 0)
 		);
 	end component;
-	signal new_data, valid, valid_d, valid_w : std_logic := '0';
+	signal new_data, valid, valid_d : std_logic := '0';
 	signal plaintext, key, ciphertext : std_logic_vector(127 downto 0) := (others => '0');
 
 	signal s_led : std_logic := '0';
@@ -31,6 +31,7 @@ architecture top_arch of top is
 
 	constant clk_divider : integer := 104;
 	signal uart_clk_cnt : integer range 0 to 250 := 0;
+	signal uart_clk : std_logic := '0';
 
 	component uart is
 		port (
@@ -43,17 +44,17 @@ architecture top_arch of top is
 			rbyte_flag : out std_logic
 		);
 	end component;
-	signal uart_clk : std_logic := '0';
 	signal tx, rx : std_logic := '1';
 	signal tbyte, rbyte : std_logic_vector(7 downto 0) := (others => '0');
 	signal tbyte_f, rbyte_f : std_logic := '0';
 
+	type rx_state_t is (IDLE, RX_WRT, CHECK, PREIDLE);
+	signal rx_state : rx_state_t := IDLE;
 	signal input_buf : std_logic_vector(287 downto 0) := (others => '0');
-	signal eot, eot_d : std_logic := '0';
 
 	type tx_state_t is (IDLE, TX_WRT, TX_W);
 	signal tx_state : tx_state_t := IDLE;
-	signal tx_byte_cnt : integer := 0;
+	signal tx_byte_cnt : integer range 0 to 50 := 0;
 	signal tx_wait_cnt : integer range 0 to 100 := 0;
 
 begin
@@ -73,75 +74,61 @@ begin
 		end if;
 	end process;
 
+
 	rx <= PIN_1;
 	PIN_2 <= tx;
 	LED <= s_led;
+
 
 	uart1 : uart port map (uart_clk, tx, rx, tbyte, tbyte_f, rbyte, rbyte_f);
 	aes_encrypt_1 : aes_encrypt port map (CLK, new_data, plaintext, key, valid, ciphertext);
 
 
-	led_proc : process (clk) is
+	nstate_rx_proc : process (clk) is
 	begin
 		if rising_edge(clk) then
-			valid_d <= valid;
-			if valid_d = '0' and valid = '1' then
-				s_led <= not s_led;
-			end if;
+			case rx_state is
+				when IDLE =>
+					if rbyte_f = '1' then
+						rx_state <= RX_WRT;
+					end if;
+				when RX_WRT =>
+					rx_state <= CHECK;
+				when CHECK =>
+					rx_state <= PREIDLE;
+				when PREIDLE =>
+					if rbyte_f = '0' then
+						rx_state <= IDLE;
+					end if;
+			end case;
 		end if;
 	end process;
 
-
-	buf_proc : process (uart_clk) is
-	begin
-		if rising_edge(uart_clk) then
-			if rbyte_f = '1' then
-				input_buf <= input_buf(279 downto 0) & rbyte;
-			end if;
-		end if;
-	end process;
-
-	eot_proc : process(clk) is
-	begin
-		if rising_edge(clk) then
-			eot_d <= eot;
-			if input_buf(31 downto 0) = x"000000FF" then
-				eot <= '1';
-			else
-				eot <= '0';
-			end if;
-		end if;
-	end process;
-
-	trg_encpt_proc : process(clk) is
+	out_rx_proc : process (clk) is
 	begin
 		if rising_edge(clk) then
 			new_data <= '0';
-			if eot_d = '0' and eot = '1' then
-				new_data <= '1';
-				plaintext <= input_buf(287 downto 160);
-				key <= input_buf(159 downto 32);
-			end if;
+			case rx_state is
+				when RX_WRT =>
+					input_buf <= input_buf(279 downto 0) & rbyte;
+				when CHECK =>
+					if input_buf(31 downto 0) = x"000000FF" then
+						plaintext <= input_buf(287 downto 160);
+						key <= input_buf(159 downto 32);
+						new_data <= '1';
+					end if;
+				when others =>
+			end case;
 		end if;
 	end process;
 
-	valid_w_proc : process (clk) is
-	begin
-		if rising_edge(clk) then
-			if valid_d = '0' and valid = '1' then
-				valid_w <= '1';
-			elsif tx = '0' then
-				valid_w <= '0';
-			end if;
-		end if;
-	end process;
 
 	nstate_tx_proc : process (uart_clk) is
 	begin
 		if rising_edge(uart_clk) then
 			case tx_state is
 				when IDLE =>
-					if valid_w = '1' then
+					if valid_d = '0' and valid = '1' then
 						tx_state <= TX_WRT;
 					end if;
 				when TX_WRT =>
@@ -164,6 +151,7 @@ begin
 			case tx_state is
 				when IDLE =>
 					tx_byte_cnt <= 0;
+					valid_d <= valid;
 				when TX_WRT =>
 					tx_byte_cnt <= tx_byte_cnt + 1;
 					tx_wait_cnt <= 0;
@@ -176,6 +164,18 @@ begin
 					tx_wait_cnt <= tx_wait_cnt + 1;
 					tbyte_f <= '0';
 			end case;
+		end if;
+	end process;
+
+
+	led_proc : process (uart_clk) is
+	begin
+		if rising_edge(uart_clk) then
+			if ciphertext /= x"29E5F495D404FD12D9CB8C2C9B2327C8" then
+				s_led <= '1';
+			else
+				s_led <= '0';
+			end if;
 		end if;
 	end process;
 

@@ -21,7 +21,7 @@ architecture uart_arch of uart is
 	signal s_tdata	: std_logic_vector(9 downto 0);
 
 
-	type rx_state_t is (IDLE, WAITING, STORE, CHECK, SUCCESS);
+	type rx_state_t is (IDLE, WAITING, STORE, FINISH);
 	signal rx_state	: rx_state_t := IDLE;
 
 	signal s_rdata	: std_logic_vector(9 downto 0);
@@ -99,21 +99,13 @@ begin
 					v_cnt_clk := 7;
 					v_cnt_bit := v_cnt_bit + 1;
 					if v_cnt_bit = 10 then
-						rx_state <= CHECK;
+						rx_state <= FINISH;
 					else
 						rx_state <= WAITING;
 					end if;
 
-				-- check start and end bit
-				when CHECK =>
-					if s_rdata(0) = '0' and s_rdata(9) = '1' then
-						rx_state <= SUCCESS;
-					else
-						rx_state <= IDLE;
-					end if;
-
 				-- output received data
-				when SUCCESS =>
+				when FINISH =>
 					rbyte <= s_rdata(8 downto 1);
 					rbyte_flag <= '1';
 					rx_state <= IDLE;
